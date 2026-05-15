@@ -1,0 +1,982 @@
+rules:
+
+  # ─── CRITICAL ────────────────────────────────────────────────────────────────
+
+  - id: MCM-001
+    name: Shell / Command Execution Capability
+    description: >
+      An MCP server or tool can execute arbitrary shell commands or system
+      calls. A malicious prompt can instruct the agent to run destructive or
+      exfiltrating commands on the host system.
+    severity: CRITICAL
+    category: Excessive Agency
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+      - id: LLM01
+        name: "Prompt Injection"
+        url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Remove shell execution tools unless strictly required. If required,
+      restrict commands via an allowlist, run in a sandboxed container with
+      no network access, and require explicit human confirmation before execution.
+    detection:
+      server_name_patterns:
+        - bash
+        - shell
+        - exec
+        - terminal
+        - command
+        - cmd
+        - run
+        - powershell
+        - zsh
+        - sh
+      package_patterns:
+        - server-bash
+        - server-shell
+        - server-exec
+        - server-terminal
+        - mcp-shell
+        - mcp-bash
+      tool_name_patterns:
+        - execute_command
+        - run_command
+        - run_bash
+        - exec_command
+        - shell_exec
+        - bash_exec
+        - execute_script
+        - run_script
+        - system_exec
+      tool_description_keywords:
+        - execute shell
+        - run shell
+        - bash command
+        - shell command
+        - system command
+        - execute command
+        - terminal command
+        - run a command
+        - invoke command
+      parameter_names:
+        - command
+        - cmd
+        - shell_command
+        - bash_command
+
+  - id: MCM-002
+    name: Arbitrary Code Execution Capability
+    description: >
+      An MCP server or tool can execute arbitrary code (Python, JavaScript,
+      or other languages). Combined with prompt injection, this gives an
+      attacker full code execution on the host.
+    severity: CRITICAL
+    category: Excessive Agency
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+      - id: LLM01
+        name: "Prompt Injection"
+        url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Use a sandboxed execution environment (e.g. Pyodide, isolated Docker
+      container with no network). Restrict available built-ins and imports.
+      Never allow code execution tools in production agent deployments.
+    detection:
+      server_name_patterns:
+        - code-runner
+        - repl
+        - interpreter
+        - jupyter
+        - notebook
+        - sandbox
+        - eval
+        - runner
+      package_patterns:
+        - server-code
+        - server-repl
+        - mcp-repl
+        - mcp-jupyter
+        - code-interpreter
+      tool_name_patterns:
+        - execute_code
+        - run_code
+        - eval_code
+        - run_python
+        - run_javascript
+        - eval_python
+        - execute_python
+        - interpret_code
+      tool_description_keywords:
+        - execute code
+        - run python
+        - run javascript
+        - evaluate code
+        - interpret code
+        - execute script
+        - jupyter notebook
+        - ipython
+      parameter_names:
+        - code
+        - script
+        - source_code
+        - program
+
+  - id: MCM-003
+    name: Credential and Secret Store Access
+    description: >
+      An MCP server or tool has access to credential stores, secret managers,
+      API key vaults, or the OS keychain. Compromise via prompt injection
+      exposes all stored secrets.
+    severity: CRITICAL
+    category: Sensitive Data Exposure
+    owasp_llm:
+      - id: LLM02
+        name: "Sensitive Information Disclosure"
+        url: "https://genai.owasp.org/llmrisk/llm02-sensitive-information-disclosure/"
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.000
+        name: "LLM Prompt Injection: Direct"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.000"
+    remediation: >
+      Never expose credential or secret store access to an LLM agent. Inject
+      required secrets at the infrastructure level (env vars, mounted secrets)
+      rather than giving the agent a tool to retrieve them at runtime.
+    detection:
+      server_name_patterns:
+        - keychain
+        - vault
+        - secrets
+        - credential
+        - password
+        - bitwarden
+        - 1password
+        - lastpass
+        - keepass
+        - aws-secrets
+        - azure-keyvault
+        - hashicorp-vault
+      package_patterns:
+        - server-secrets
+        - server-vault
+        - server-keychain
+        - mcp-vault
+        - mcp-secrets
+      tool_name_patterns:
+        - get_secret
+        - read_secret
+        - fetch_secret
+        - get_password
+        - get_api_key
+        - get_credential
+        - read_vault
+      tool_description_keywords:
+        - secret manager
+        - secrets manager
+        - vault
+        - api key
+        - credential store
+        - password manager
+        - keychain
+
+  - id: MCM-004
+    name: Process Management Capability
+    description: >
+      An MCP server or tool can spawn, terminate, or manage OS processes.
+      This enables lateral movement, persistence, and denial-of-service
+      through a compromised agent.
+    severity: CRITICAL
+    category: Excessive Agency
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Remove process management tools. If system administration is needed,
+      use a dedicated, narrowly scoped automation layer with an explicit
+      allowlist of permitted operations, not an LLM agent.
+    detection:
+      tool_name_patterns:
+        - kill_process
+        - spawn_process
+        - start_process
+        - stop_process
+        - restart_service
+        - manage_process
+        - list_processes
+        - terminate_process
+      tool_description_keywords:
+        - spawn process
+        - kill process
+        - manage process
+        - start service
+        - stop service
+        - restart service
+        - process management
+      parameter_names:
+        - pid
+        - process_id
+        - process_name
+
+  # ─── HIGH ─────────────────────────────────────────────────────────────────
+
+  - id: MCM-005
+    name: Filesystem Write Access
+    description: >
+      An MCP server or tool can write, modify, or delete files on the host
+      filesystem. A compromised agent can overwrite configuration, delete
+      data, or plant malicious files.
+    severity: HIGH
+    category: Excessive Agency
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Restrict filesystem write access to the minimum required directory.
+      Use a read-only mount where possible. Require confirmation before
+      destructive file operations (delete, overwrite).
+    detection:
+      tool_name_patterns:
+        - write_file
+        - create_file
+        - delete_file
+        - move_file
+        - rename_file
+        - update_file
+        - save_file
+        - overwrite_file
+        - remove_file
+        - edit_file
+      tool_description_keywords:
+        - write file
+        - create file
+        - delete file
+        - modify file
+        - overwrite file
+        - save to file
+        - write to disk
+        - remove file
+      parameter_names:
+        - file_path
+        - destination
+        - target_path
+        - write_path
+
+  - id: MCM-006
+    name: Unrestricted Network Fetch / HTTP Request
+    description: >
+      An MCP server or tool can make arbitrary outbound HTTP/HTTPS requests.
+      This is a data exfiltration path and enables SSRF attacks — an agent
+      can be instructed to send sensitive context to an attacker-controlled
+      endpoint.
+    severity: HIGH
+    category: Data Exfiltration
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+      - id: LLM02
+        name: "Sensitive Information Disclosure"
+        url: "https://genai.owasp.org/llmrisk/llm02-sensitive-information-disclosure/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Restrict outbound requests to an allowlist of approved domains.
+      Log all outbound URLs. Block requests to RFC-1918 addresses to
+      prevent SSRF. Consider a proxy layer for all agent HTTP traffic.
+    detection:
+      tool_name_patterns:
+        - fetch_url
+        - http_request
+        - make_request
+        - get_url
+        - post_url
+        - web_request
+        - send_request
+        - curl
+        - wget
+      tool_description_keywords:
+        - fetch url
+        - http request
+        - make a request
+        - send a request
+        - web request
+        - retrieve url
+        - download from
+        - outbound request
+        - call api
+      parameter_names:
+        - url
+        - endpoint
+        - uri
+        - target_url
+        - request_url
+
+  - id: MCM-007
+    name: Email Send Capability
+    description: >
+      An MCP server or tool can compose and send emails. This is a high-risk
+      data exfiltration path — a prompt injection attack can instruct the
+      agent to email sensitive conversation context or files to arbitrary
+      recipients.
+    severity: HIGH
+    category: Data Exfiltration
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+      - id: LLM02
+        name: "Sensitive Information Disclosure"
+        url: "https://genai.owasp.org/llmrisk/llm02-sensitive-information-disclosure/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Restrict send-to addresses to an approved allowlist. Never allow
+      the LLM to set the recipient address from untrusted input. Require
+      human review/confirmation before any email is sent.
+    detection:
+      server_name_patterns:
+        - gmail
+        - outlook
+        - smtp
+        - email
+        - mail
+        - sendgrid
+        - mailgun
+        - postmark
+      package_patterns:
+        - server-gmail
+        - server-email
+        - mcp-email
+        - mcp-gmail
+        - server-smtp
+      tool_name_patterns:
+        - send_email
+        - send_mail
+        - compose_email
+        - draft_email
+        - email_send
+      tool_description_keywords:
+        - send email
+        - send mail
+        - compose email
+        - send a message to
+        - email recipient
+        - smtp send
+
+  - id: MCM-008
+    name: Git Write / Repository Push Access
+    description: >
+      An MCP server or tool can commit and push to git repositories. A
+      compromised agent could introduce malicious code into a codebase,
+      creating a supply chain risk.
+    severity: HIGH
+    category: Supply Chain
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+      - id: LLM03
+        name: "Supply Chain"
+        url: "https://genai.owasp.org/llmrisk/llm03-supply-chain/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Require mandatory human review of all diffs before commit. Use a
+      dedicated bot account with branch-protection rules. Never allow
+      direct push to main/production branches from an agent.
+    detection:
+      tool_name_patterns:
+        - git_commit
+        - git_push
+        - push_commits
+        - create_commit
+        - force_push
+        - push_branch
+      tool_description_keywords:
+        - git commit
+        - git push
+        - push to
+        - commit changes
+        - push changes
+        - create commit
+        - force push
+
+  - id: MCM-009
+    name: Database Write / Delete Access
+    description: >
+      An MCP server or tool can write to, update, or delete records in a
+      database. An agent manipulated via prompt injection could corrupt,
+      delete, or exfiltrate database content.
+    severity: HIGH
+    category: Excessive Agency
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Use a read-only database user for agent queries. Separate read and
+      write tools and require confirmation before any write/delete. Apply
+      row-level security to limit the scope of accessible data.
+    detection:
+      tool_name_patterns:
+        - db_write
+        - db_delete
+        - db_update
+        - insert_record
+        - delete_record
+        - update_record
+        - execute_query
+        - run_query
+        - drop_table
+      tool_description_keywords:
+        - insert into
+        - delete from
+        - update table
+        - drop table
+        - execute query
+        - write to database
+        - modify database
+        - delete record
+      parameter_names:
+        - query
+        - sql_query
+        - sql
+
+  - id: MCM-010
+    name: API Key or Token Exposed in Server Environment
+    description: >
+      An MCP server configuration passes an API key, token, or password
+      as a plaintext environment variable. If this config is committed to
+      version control or logged, the secret is exposed.
+    severity: HIGH
+    category: Sensitive Data Exposure
+    owasp_llm:
+      - id: LLM02
+        name: "Sensitive Information Disclosure"
+        url: "https://genai.owasp.org/llmrisk/llm02-sensitive-information-disclosure/"
+    mitre_atlas:
+      - id: AML.T0051.000
+        name: "LLM Prompt Injection: Direct"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.000"
+    remediation: >
+      Use a secrets manager or OS keychain to inject credentials at runtime
+      rather than hardcoding them in config files. Add config files
+      containing credentials to .gitignore.
+    detection:
+      env_key_patterns:
+        - API_KEY
+        - SECRET
+        - TOKEN
+        - PASSWORD
+        - PASSWD
+        - PRIVATE_KEY
+        - AUTH_KEY
+        - ACCESS_KEY
+        - SECRET_KEY
+        - AUTH_TOKEN
+        - BEARER_TOKEN
+        - API_SECRET
+        - CLIENT_SECRET
+
+  - id: MCM-011
+    name: Broad Filesystem Access (Root or Home Directory)
+    description: >
+      An MCP filesystem server is configured with access to the root (/),
+      home (~), or another broad directory. This exposes SSH keys, shell
+      history, browser credentials, and other sensitive files to the agent.
+    severity: HIGH
+    category: Sensitive Data Exposure
+    owasp_llm:
+      - id: LLM02
+        name: "Sensitive Information Disclosure"
+        url: "https://genai.owasp.org/llmrisk/llm02-sensitive-information-disclosure/"
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Restrict filesystem server access to the minimum required project
+      directory. Never grant access to /, ~, /home, /Users, /etc, or
+      similar broad paths.
+    detection:
+      broad_path_patterns:
+        - "/"
+        - "~"
+        - "/home"
+        - "/Users"
+        - "/root"
+        - "/etc"
+        - "C:\\"
+        - "C:\\Users"
+        - "%USERPROFILE%"
+        - "%HOMEDRIVE%"
+
+  - id: MCM-012
+    name: Overprivileged MCP Server
+    description: >
+      A single MCP server exposes 5 or more tools that are individually
+      rated HIGH or CRITICAL. Concentration of powerful capabilities in
+      one server maximizes blast radius if the agent is compromised.
+    severity: HIGH
+    category: Excessive Agency
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Apply least-privilege by splitting capabilities across purpose-scoped
+      servers. Disable tools not actively needed. Consider a tool-gating
+      layer that requires the agent to request capability elevation.
+    detection:
+      high_risk_tool_threshold: 5
+
+  # ─── MEDIUM ───────────────────────────────────────────────────────────────
+
+  - id: MCM-013
+    name: Unrestricted Web Browsing / Browser Automation
+    description: >
+      An MCP server or tool provides web browsing or browser automation
+      without domain restrictions. Visiting attacker-controlled pages
+      enables indirect prompt injection via page content.
+    severity: MEDIUM
+    category: Prompt Injection Risk
+    owasp_llm:
+      - id: LLM01
+        name: "Prompt Injection"
+        url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Restrict browsing to an allowlist of trusted domains. Strip or
+      sanitize HTML content before injecting into LLM context. Treat
+      all web-fetched content as untrusted user input.
+    detection:
+      server_name_patterns:
+        - browser
+        - playwright
+        - puppeteer
+        - selenium
+        - chromium
+        - firefox
+        - browsing
+        - web-browsing
+        - web-search
+      package_patterns:
+        - server-browser
+        - server-playwright
+        - mcp-browser
+        - mcp-playwright
+        - mcp-puppeteer
+      tool_name_patterns:
+        - browse_web
+        - open_browser
+        - navigate_to
+        - web_browse
+        - browser_navigate
+        - fetch_page
+      tool_description_keywords:
+        - browse to
+        - open a browser
+        - navigate to url
+        - web browsing
+        - playwright
+        - puppeteer
+        - load page
+
+  - id: MCM-014
+    name: Unverified Third-Party MCP Server
+    description: >
+      An MCP server is sourced from an unofficial or community registry
+      (not @modelcontextprotocol or a verified org). Third-party servers
+      may have undisclosed capabilities or supply chain vulnerabilities.
+    severity: MEDIUM
+    category: Supply Chain
+    owasp_llm:
+      - id: LLM03
+        name: "Supply Chain"
+        url: "https://genai.owasp.org/llmrisk/llm03-supply-chain/"
+    mitre_atlas:
+      - id: AML.T0051.000
+        name: "LLM Prompt Injection: Direct"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.000"
+    remediation: >
+      Audit all third-party MCP server source code before deployment.
+      Pin server versions. Prefer servers from @modelcontextprotocol
+      or vendors with published security policies.
+    detection:
+      trusted_package_prefixes:
+        - "@modelcontextprotocol/"
+        - "@anthropic-ai/"
+        - "@openai/"
+        - "@microsoft/"
+        - "@google/"
+        - "@aws-sdk/"
+
+  - id: MCM-015
+    name: Tool Missing Description (Tool Confusion Risk)
+    description: >
+      One or more tools have no description or an empty description. Without
+      a description the LLM cannot distinguish tool intent, increasing the
+      risk of tool confusion attacks where an adversary manipulates which
+      tool is invoked.
+    severity: MEDIUM
+    category: Tool Confusion
+    owasp_llm:
+      - id: LLM01
+        name: "Prompt Injection"
+        url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    mitre_atlas:
+      - id: AML.T0054
+        name: "LLM Jailbreak"
+        url: "https://atlas.mitre.org/techniques/AML.T0054"
+    remediation: >
+      Add clear, unambiguous descriptions to every tool. Descriptions
+      should state exactly what the tool does, what data it accesses,
+      and any side effects. Vague or missing descriptions increase
+      prompt injection surface area.
+    detection:
+      check_empty_description: true
+
+  - id: MCM-016
+    name: Sensitive Directory Read Access
+    description: >
+      An MCP server or tool has read access to directories known to contain
+      sensitive data such as SSH keys, browser profiles, shell history,
+      or certificate stores.
+    severity: MEDIUM
+    category: Sensitive Data Exposure
+    owasp_llm:
+      - id: LLM02
+        name: "Sensitive Information Disclosure"
+        url: "https://genai.owasp.org/llmrisk/llm02-sensitive-information-disclosure/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Exclude sensitive directories from filesystem server access. Add
+      explicit deny rules for ~/.ssh, ~/.gnupg, ~/.aws, browser profile
+      directories, and certificate stores.
+    detection:
+      sensitive_path_patterns:
+        - ".ssh"
+        - ".gnupg"
+        - ".aws"
+        - ".azure"
+        - ".gcloud"
+        - ".kube"
+        - "Library/Keychains"
+        - "AppData/Roaming"
+        - ".bash_history"
+        - ".zsh_history"
+        - ".netrc"
+        - ".npmrc"
+        - ".pypirc"
+        - "/etc/passwd"
+        - "/etc/shadow"
+        - "/etc/ssl"
+        - "id_rsa"
+        - "id_ed25519"
+
+  # ─── LOW ──────────────────────────────────────────────────────────────────
+
+  - id: MCM-017
+    name: Calendar Write Access
+    description: >
+      An MCP server or tool can create, modify, or delete calendar events.
+      A compromised agent could plant fake events, delete real appointments,
+      or exfiltrate calendar data to expose private scheduling information.
+    severity: LOW
+    category: Data Exfiltration
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Use read-only calendar access where the agent only needs to check
+      availability. Require confirmation before creating or deleting events.
+    detection:
+      tool_name_patterns:
+        - create_event
+        - delete_event
+        - update_event
+        - add_event
+        - modify_event
+      tool_description_keywords:
+        - create event
+        - add event
+        - delete event
+        - calendar write
+        - schedule meeting
+
+  - id: MCM-018
+    name: Social Media Post Capability
+    description: >
+      An MCP server or tool can post content to social media platforms.
+      A prompt injection attack could cause the agent to post harmful,
+      defamatory, or sensitive content publicly.
+    severity: LOW
+    category: Data Exfiltration
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0048
+        name: "Societal Harm"
+        url: "https://atlas.mitre.org/techniques/AML.T0048"
+    remediation: >
+      Require mandatory human review before any social media post.
+      Use a staging/draft mode and never allow the agent to publish directly.
+    detection:
+      tool_name_patterns:
+        - post_tweet
+        - create_post
+        - publish_post
+        - send_tweet
+        - post_linkedin
+        - create_tweet
+      tool_description_keywords:
+        - post to twitter
+        - post to linkedin
+        - tweet
+        - social media post
+        - publish to
+
+  - id: MCM-019
+    name: Push Notification Send Capability
+    description: >
+      An MCP server or tool can send push notifications to devices or
+      messaging platforms. This is a low-severity exfiltration vector
+      and potential spam/abuse path.
+    severity: LOW
+    category: Data Exfiltration
+    owasp_llm:
+      - id: LLM06
+        name: "Excessive Agency"
+        url: "https://genai.owasp.org/llmrisk/llm06-excessive-agency/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Apply rate limiting on notification sends. Restrict recipient
+      addresses to an allowlist. Require confirmation for bulk sends.
+    detection:
+      tool_name_patterns:
+        - send_notification
+        - push_notification
+        - send_push
+        - notify_user
+        - send_alert
+      tool_description_keywords:
+        - push notification
+        - send notification
+        - notify user
+        - send alert
+
+  # ─── SUPPLY CHAIN / SECRETS (extended) ────────────────────────────────────
+
+  - id: MCM-020
+    name: Unpinned Package Version in Auto-Accept Runner
+    description: >
+      An MCP server uses npx, uvx, or bunx with the -y / --yes flag but
+      without a pinned package version. The package is re-fetched on every
+      run and can be silently updated by the registry, enabling a supply
+      chain attack via a malicious update.
+    severity: HIGH
+    category: Supply Chain
+    owasp_llm:
+      - id: LLM03
+        name: "Supply Chain"
+        url: "https://genai.owasp.org/llmrisk/llm03-supply-chain/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Pin the exact package version in the args (e.g. @package@1.2.3 instead
+      of @package). Periodically review and update the pinned version after
+      auditing the changelog. Consider a private registry mirror.
+    detection:
+      check_unpinned_package: true
+
+  - id: MCM-021
+    name: Adversarial Instructions Embedded in Tool Description
+    description: >
+      A tool description contains patterns commonly used in prompt injection
+      attacks — phrases designed to override system instructions, hijack the
+      agent's behaviour, or extract sensitive context. This may indicate a
+      compromised or malicious MCP server.
+    severity: HIGH
+    category: Prompt Injection Risk
+    owasp_llm:
+      - id: LLM01
+        name: "Prompt Injection"
+        url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    mitre_atlas:
+      - id: AML.T0051.000
+        name: "LLM Prompt Injection: Direct"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.000"
+      - id: AML.T0054
+        name: "LLM Jailbreak"
+        url: "https://atlas.mitre.org/techniques/AML.T0054"
+    remediation: >
+      Remove or audit the flagged tool immediately. Tool descriptions must
+      never contain instructions directed at the LLM. Only include factual
+      descriptions of what the tool does and its parameters.
+    detection:
+      description_injection_patterns:
+        - "ignore previous instructions"
+        - "ignore all previous"
+        - "disregard previous"
+        - "disregard all instructions"
+        - "forget previous instructions"
+        - "you are now"
+        - "from now on you"
+        - "your new instructions"
+        - "act as if"
+        - "pretend you are"
+        - "new system prompt"
+        - "override your instructions"
+        - "do not follow"
+        - "bypass your"
+        - "jailbreak"
+        - "DAN mode"
+        - "developer mode"
+        - "<!-- "
+        - "<system>"
+        - "[INST]"
+        - "###instruction"
+
+  - id: MCM-022
+    name: High-Entropy Secret in Server Environment
+    description: >
+      An MCP server environment variable contains a high-entropy value
+      consistent with a hardcoded API key, token, or private key — even
+      though the variable name does not match a known secret keyword. Committing
+      this config exposes the credential.
+    severity: HIGH
+    category: Sensitive Data Exposure
+    owasp_llm:
+      - id: LLM02
+        name: "Sensitive Information Disclosure"
+        url: "https://genai.owasp.org/llmrisk/llm02-sensitive-information-disclosure/"
+    mitre_atlas:
+      - id: AML.T0051.000
+        name: "LLM Prompt Injection: Direct"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.000"
+    remediation: >
+      Move the value to a secrets manager, OS keychain, or environment
+      variable injected at runtime. Add this config file to .gitignore.
+      Rotate the credential immediately if the file has been committed.
+    detection:
+      env_value_entropy_threshold: 4.5
+      env_value_min_length: 20
+
+  - id: MCM-023
+    name: Remote MCP Server over HTTP/SSE
+    description: >
+      An MCP server is configured as a remote HTTP/SSE endpoint rather than
+      a local process. Remote servers are third-party infrastructure outside
+      your control. A compromised or malicious remote server can return
+      adversarial tool outputs designed to inject into the agent's context.
+    severity: MEDIUM
+    category: Supply Chain
+    owasp_llm:
+      - id: LLM03
+        name: "Supply Chain"
+        url: "https://genai.owasp.org/llmrisk/llm03-supply-chain/"
+      - id: LLM01
+        name: "Prompt Injection"
+        url: "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Audit the remote MCP server's security policy and source code before
+      use. Prefer locally-run servers you control. If remote servers are
+      required, pin the endpoint URL (not a CNAME/redirect), verify TLS,
+      and sanitize all tool outputs before injecting into agent context.
+    detection:
+      check_remote_server: true
+
+  - id: MCM-024
+    name: Package Name Resembles Trusted Publisher (Typosquatting)
+    description: >
+      An MCP package name is typographically close (1–2 character edits) to
+      a name published by a trusted organisation but does not match exactly.
+      This is a common supply chain attack pattern — a malicious package is
+      published with a name that is easy to confuse with a legitimate one.
+    severity: HIGH
+    category: Supply Chain
+    owasp_llm:
+      - id: LLM03
+        name: "Supply Chain"
+        url: "https://genai.owasp.org/llmrisk/llm03-supply-chain/"
+    mitre_atlas:
+      - id: AML.T0051.001
+        name: "LLM Prompt Injection: Indirect"
+        url: "https://atlas.mitre.org/techniques/AML.T0051.001"
+    remediation: >
+      Verify the exact package name on the official registry before use.
+      Check the publisher's GitHub org, npm page, and star count. Prefer
+      the canonical @modelcontextprotocol/ or @anthropic-ai/ packages.
+    detection:
+      check_typosquatting: true
+      typosquatting_distance: 2
+      trusted_package_prefixes:
+        - "@modelcontextprotocol/"
+        - "@anthropic-ai/"
+        - "@openai/"
+        - "@microsoft/"
+        - "@google/"
+        - "@aws-sdk/"

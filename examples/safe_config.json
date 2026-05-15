@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "docs-reader": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/workspace/docs"],
+      "env": {}
+    }
+  }
+}
