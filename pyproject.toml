@@ -7,7 +7,8 @@ name = "mcpmap"
 version = "1.0.0"
 description = "Static attack surface analyzer for AI agents, MCP servers, and LLM tool definitions."
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Bogdan Ticu", email = "bogdanticuoffice@gmail.com" }]
 keywords = [
     "mcp", "ai-security", "llm-security", "owasp", "mitre-atlas",
@@ -18,7 +19,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
