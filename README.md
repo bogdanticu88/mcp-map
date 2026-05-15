@@ -1,6 +1,6 @@
 # mcpmap
 
-**Static attack surface analyzer for AI agents, MCP servers, and LLM tool definitions.**
+Static attack surface analyzer for MCP servers and LLM tool definitions.
 
 mcpmap scans MCP server configurations and OpenAI-style tool definitions for security risks, mapping every finding to [OWASP LLM Top 10](https://genai.owasp.org/) and [MITRE ATLAS](https://atlas.mitre.org/). Use it in CI/CD pipelines, pre-commit hooks, or as a REST API.
 
@@ -8,15 +8,15 @@ mcpmap scans MCP server configurations and OpenAI-style tool definitions for sec
 
 ## Features
 
-- **24 detection rules** across CRITICAL / HIGH / MEDIUM / LOW severity
-- Supports Claude Desktop `claude_desktop_config.json`, MCP config format, OpenAI tool definitions, and **remote HTTP/SSE MCP servers**
-- **Entropy-based secret detection** — catches hardcoded secrets even when env var names don't look like keys
-- **Unpinned package detection** — flags `npx -y @pkg/name` without a version pin
-- **Typosquatting detection** — edit-distance comparison against trusted publishers
-- **Adversarial instruction detection** — flags prompt-injection patterns embedded in tool descriptions
-- **Suppression / allow-list** via `.mcpmap-ignore` — silence known findings without losing other coverage
-- **Baseline / diff mode** — `--baseline` shows only what changed since the last scan
-- **Context-aware remediation** — advice names the exact path, key, or package to fix
+- 24 detection rules across CRITICAL / HIGH / MEDIUM / LOW severity
+- Supports Claude Desktop `claude_desktop_config.json`, MCP config format, OpenAI tool definitions, and remote HTTP/SSE MCP servers
+- **Entropy-based secret detection**: catches hardcoded secrets even when env var names don't look like keys
+- **Unpinned package detection**: flags `npx -y @pkg/name` without a version pin
+- **Typosquatting detection**: edit-distance comparison against trusted publishers
+- **Adversarial instruction detection**: flags prompt-injection patterns embedded in tool descriptions
+- **Suppression / allow-list** via `.mcpmap-ignore`: silences known findings without losing other coverage
+- **Baseline / diff mode**: `--baseline` shows only what changed since the last scan
+- **Context-aware remediation**: advice names the exact path, key, or package to fix
 - Output formats: Markdown, JSON, HTML (dark-mode report), SARIF (for GitHub Code Scanning)
 - REST API (`mcpmap serve`) for integration with web tooling
 - `--fail-on` flag for CI gate enforcement
@@ -33,12 +33,12 @@ pip install mcpmap
 Or from source:
 
 ```bash
-git clone https://github.com/bogdanticu88/mcpmap
-cd mcpmap
+git clone https://github.com/bogdanticu88/mcp-map
+cd mcp-map
 pip install -e ".[dev]"
 ```
 
-Works on **Windows, macOS, and Linux**. Requires Python 3.9+.
+Works on Windows, macOS, and Linux. Requires Python 3.9+.
 
 Set `NO_COLOR=1` to disable all colour output.
 
@@ -53,7 +53,7 @@ mcpmap find
 # Scan a config file
 mcpmap scan ~/.config/Claude/claude_desktop_config.json
 
-# Scan a directory for all JSON/YAML agent configs
+# Scan a directory for all JSON/YAML configs
 mcpmap scan ./configs/
 
 # Show all built-in detection rules
@@ -105,11 +105,11 @@ TARGETS can be individual files or directories. Directories are walked recursive
 | `--fail-on` | Exit with code 1 if any finding is at or above this severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) |
 | `--summary` | Print terminal summary table only |
 | `--ascii` | ASCII-only output (no emoji/badges) |
-| `--rules` | Path to custom rules YAML — replaces the built-in rule set |
+| `--rules` | Path to custom rules YAML; replaces the built-in rule set |
 | `--ignore-file` | Path to a suppression file (default: `.mcpmap-ignore` in target dir or CWD) |
 | `--no-ignore` | Disable all suppression file loading |
 | `--show-suppressed` | Include suppressed findings in the report |
-| `--baseline` | Path to a previous JSON scan result — marks new findings as NEW |
+| `--baseline` | Path to a previous JSON scan result; marks new findings as NEW |
 | `--save-baseline` | Save current results as a baseline JSON file |
 | `--version`, `-V` | Show version and exit |
 
@@ -117,9 +117,9 @@ TARGETS can be individual files or directories. Directories are walked recursive
 
 | Code | Meaning |
 |---|---|
-| `0` | Success — scan completed, no findings at or above `--fail-on` threshold (or `--fail-on` not set) |
-| `1` | Findings detected at or above the `--fail-on` severity threshold |
-| `2` | Error — bad `--rules` or `--baseline` path, target not found, or output file not writable |
+| `0` | No findings at or above the `--fail-on` threshold (or `--fail-on` not set) |
+| `1` | One or more findings at or above the `--fail-on` severity threshold |
+| `2` | Invalid `--rules` or `--baseline` path, target not found, or output file not writable |
 
 ### `mcpmap rules`
 
@@ -146,7 +146,7 @@ mcpmap serve [OPTIONS]
 | Option | Description |
 |---|---|
 | `--host` | Bind host (default: `127.0.0.1`) |
-| `--port`, `-p` | Bind port, 1–65535 (default: `8000`) |
+| `--port`, `-p` | Bind port, 1-65535 (default: `8000`) |
 | `--rules` | Path to custom rules YAML |
 
 ---
@@ -182,7 +182,7 @@ mcpmap scan config.json --show-suppressed
 
 ## Baseline / Diff Mode
 
-Track what changes between scans — useful in CI to alert only on regressions:
+Track what changes between scans. Useful in CI to alert only on regressions.
 
 ```bash
 # Step 1: save the current findings as a baseline
@@ -192,10 +192,11 @@ mcpmap scan config.json --save-baseline baseline.json
 mcpmap scan config.json --baseline baseline.json
 ```
 
-The output reports:
-- **NEW** — findings that didn't exist in the baseline
-- **Resolved** — findings present in the baseline but no longer detected
-- **Unchanged** — everything else (hidden from the diff summary)
+Each finding in the output is labelled:
+
+- **NEW**: finding did not exist in the baseline
+- **Resolved**: finding was in the baseline but is no longer detected
+- **Unchanged**: present in both (hidden from the diff summary)
 
 Combine with `--fail-on` to fail CI only when new findings are introduced:
 
@@ -377,9 +378,9 @@ Each finding includes:
 | MCM-001 to MCM-019 | Pattern matching on server names, package names, tool names, descriptions, env keys, and filesystem paths |
 | MCM-020 | Detects `npx`/`uvx`/`bunx` with `-y`/`--yes` and no version-pinned package arg |
 | MCM-021 | Matches 20+ known prompt-injection phrase patterns in tool descriptions |
-| MCM-022 | Shannon entropy ≥ 4.5 bits/char on env variable values ≥ 20 chars (with URL/path exclusions) |
+| MCM-022 | Shannon entropy >= 4.5 bits/char on env variable values >= 20 chars (with URL/path exclusions) |
 | MCM-023 | Detects servers configured with a `url` field instead of a local `command` |
-| MCM-024 | Levenshtein distance ≤ 2 between package scope and trusted publisher names |
+| MCM-024 | Levenshtein distance <= 2 between package scope and trusted publisher names |
 
 ---
 
@@ -458,7 +459,7 @@ mcpmap rules --rules my_rules.yaml
     sarif_file: mcpmap.sarif
 ```
 
-**With baseline diff** — fail only on new regressions:
+With baseline diff to fail only on new regressions:
 
 ```yaml
 - name: Restore baseline
@@ -529,23 +530,23 @@ python -m mcpmap rules
 
 mcpmap findings map to:
 
-- **[OWASP LLM Top 10](https://genai.owasp.org/)** — LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM03 Supply Chain, LLM06 Excessive Agency
-- **[MITRE ATLAS](https://atlas.mitre.org/)** — AML.T0051.000 (Direct Prompt Injection), AML.T0051.001 (Indirect Prompt Injection), AML.T0054 (LLM Jailbreak), AML.T0048 (Societal Harm)
+- **[OWASP LLM Top 10](https://genai.owasp.org/)**: LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM03 Supply Chain, LLM06 Excessive Agency
+- **[MITRE ATLAS](https://atlas.mitre.org/)**: AML.T0051.000 (Direct Prompt Injection), AML.T0051.001 (Indirect Prompt Injection), AML.T0054 (LLM Jailbreak), AML.T0048 (Societal Harm)
 
 ---
 
 ## Limitations
 
-mcpmap is a **static analyzer** — it reads configuration files without executing any code or making network requests.
+mcpmap is a static analyzer. It reads configuration files without executing any code or making network requests.
 
 - It cannot detect runtime misconfigurations or vulnerabilities introduced after the agent starts.
-- Entropy-based secret detection (MCM-022) may produce false positives on long random-looking values (e.g., base64-encoded certificates, UUIDs concatenated together). Use `.mcpmap-ignore` to suppress confirmed non-secrets.
-- Typosquatting detection (MCM-024) compares the package scope against a built-in list of trusted publishers. It will not flag typosquatting of publishers not in that list.
+- Entropy-based secret detection (MCM-022) may produce false positives on long random-looking values (e.g., base64-encoded certificates, concatenated UUIDs). Use `.mcpmap-ignore` to suppress confirmed non-secrets.
+- Typosquatting detection (MCM-024) compares the package scope against a built-in list of trusted publishers. Publishers not in that list are not checked.
 - Pattern matching rules (MCM-001 to MCM-019) look for known-dangerous names and capabilities. Novel tools with custom names that wrap dangerous operations are not detected unless they match a known pattern or custom rule.
-- mcpmap does not perform sandbox execution, sandboxed import analysis, or dynamic taint analysis.
+- mcpmap does not perform sandbox execution, import analysis, or dynamic taint analysis.
 
 ---
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

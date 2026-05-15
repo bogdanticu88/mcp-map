@@ -7,7 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [1.0.0] — 2026-05-15
+## [1.0.0] - 2026-05-15
 
 Initial public release.
 
@@ -47,22 +47,22 @@ Initial public release.
 
 ### Features
 
-- **YAML rule engine** — load built-in rules or supply your own via `--rules`
-- **Claude Desktop config support** — `mcpmap find` detects the config on Windows, macOS, and Linux
-- **OpenAI tool definition support** — `tools: [...]` array format
-- **Remote MCP server support** — servers configured with a `url` field are scanned; auth headers are checked for exposed secrets
-- **Entropy-based secret detection** — Shannon entropy ≥ 4.5 bits/char on env/header values ≥ 20 chars
-- **Unpinned package detection** — flags `npx -y @pkg/name` without a version pin
-- **Typosquatting detection** — Levenshtein distance ≤ 2 against trusted publisher names
-- **Adversarial instruction detection** — 20+ prompt-injection phrase patterns in tool descriptions
-- **Context-aware remediation** — advice names the exact path, key, or package to fix
-- **Suppression / allow-list** — `.mcpmap-ignore` per-rule, per-server, or wildcard entries
-- **Baseline / diff mode** — `--baseline` / `--save-baseline` for CI regression gating
-- **Output formats** — Markdown, JSON, HTML (dark-mode report), SARIF
-- **REST API** — `mcpmap serve` with `/analyze`, `/rules`, `/health` endpoints
-- **CI gate** — `--fail-on` exit code 1 on threshold; exit code 2 on bad inputs
-- **Custom rules** — extend or replace built-in rules with a YAML file
-- **`--summary`** — terminal-only summary table without full report
-- **`--ascii`** — ASCII-only output, no emoji or shields.io badges
-- **`--show-suppressed`** — include suppressed findings in report
-- **OWASP LLM Top 10 and MITRE ATLAS** mappings on every finding
+- YAML rule engine: load built-in rules or supply your own via `--rules`
+- Claude Desktop config detection on Windows, macOS, and Linux via `mcpmap find`
+- OpenAI tool definition support (`tools: [...]` array format)
+- Remote MCP server support: servers configured with a `url` field are scanned; auth headers are checked for exposed secrets
+- Entropy-based secret detection: Shannon entropy >= 4.5 bits/char on env/header values >= 20 chars
+- Unpinned package detection: flags `npx -y @pkg/name` without a version pin
+- Typosquatting detection: Levenshtein distance <= 2 against trusted publisher names
+- Adversarial instruction detection: 20+ prompt-injection phrase patterns in tool descriptions
+- Context-aware remediation: advice names the exact path, key, or package to fix
+- Suppression / allow-list via `.mcpmap-ignore` with per-rule, per-server, and wildcard entries
+- Baseline / diff mode via `--baseline` and `--save-baseline` for CI regression gating
+- Output formats: Markdown, JSON, HTML (dark-mode report), SARIF
+- REST API (`mcpmap serve`) with `/analyze`, `/rules`, and `/health` endpoints
+- CI gate via `--fail-on`: exit code 1 on threshold breach, exit code 2 on bad inputs
+- Custom rules: extend or replace the built-in rule set with a YAML file
+- `--summary`: terminal-only summary table without the full report
+- `--ascii`: ASCII-only output, no badges
+- `--show-suppressed`: include suppressed findings in the report
+- OWASP LLM Top 10 and MITRE ATLAS mappings on every finding
