@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from mcpmap import __version__
 from mcpmap.engine import scan_path, _load_rules, RulesLoadError
-from mcpmap.models import AnalysisResult, Severity
+from mcpmap.models import Severity
 from mcpmap.reporters import JSONReporter, MarkdownReporter, HTMLReporter, SARIFReporter
 
 

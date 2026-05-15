@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from jinja2 import Environment, BaseLoader
-from mcpmap.models import AnalysisResult, Severity
+from mcpmap.models import AnalysisResult
 
 _TEMPLATE = """<!DOCTYPE html>
 <html lang="en">

@@ -12,7 +12,7 @@ from rich.console import Console
 from rich.table import Table
 
 from mcpmap import __version__
-from mcpmap.baseline import BaselineLoadError, load_baseline, mark_new_findings, save_baseline
+from mcpmap.baseline import BaselineLoadError, load_baseline, mark_new_findings
 from mcpmap.engine import RulesLoadError, TargetNotFoundError, _load_rules, scan_path
 from mcpmap.models import Severity
 from mcpmap.reporters import HTMLReporter, JSONReporter, MarkdownReporter, SARIFReporter
