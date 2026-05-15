@@ -51,9 +51,9 @@ dev = [
 mcpmap = "mcpmap.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/bogdanticu88/mcpmap"
-Repository = "https://github.com/bogdanticu88/mcpmap"
-"Bug Tracker" = "https://github.com/bogdanticu88/mcpmap/issues"
+Homepage = "https://github.com/bogdanticu88/mcp-map"
+Repository = "https://github.com/bogdanticu88/mcp-map"
+"Bug Tracker" = "https://github.com/bogdanticu88/mcp-map/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
