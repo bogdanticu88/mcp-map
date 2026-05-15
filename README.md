@@ -1,3 +1,15 @@
+<p align="center">
+  <img src="assets/logo.png" alt="mcpmap" width="200" />
+</p>
+
+<p align="center">
+  <a href="https://pypi.org/project/mcpmap/"><img src="https://img.shields.io/pypi/v/mcpmap?color=5b67f5&label=pypi" alt="PyPI version" /></a>
+  <a href="https://pypi.org/project/mcpmap/"><img src="https://img.shields.io/pypi/pyversions/mcpmap?color=5b67f5" alt="Python versions" /></a>
+  <a href="https://github.com/bogdanticu88/mcp-map/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/bogdanticu88/mcp-map/ci.yml?branch=main&label=CI" alt="CI" /></a>
+  <a href="https://pypi.org/project/mcpmap/"><img src="https://img.shields.io/pypi/dm/mcpmap?color=5b67f5&label=installs" alt="PyPI downloads" /></a>
+  <a href="https://github.com/bogdanticu88/mcp-map/blob/main/LICENSE"><img src="https://img.shields.io/github/license/bogdanticu88/mcp-map?color=5b67f5" alt="License" /></a>
+</p>
+
 # mcpmap
 
 Static attack surface analyzer for MCP servers and LLM tool definitions.
