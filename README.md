@@ -1,5 +1,11 @@
 <p align="center">
-  <img src="assets/logo.png" alt="mcpmap" width="200" />
+  <img src="assets/logo.png" alt="mcpmap" width="180" />
+</p>
+
+<h1 align="center">mcpmap</h1>
+
+<p align="center">
+  Static attack surface analyzer for MCP servers and LLM tool definitions.
 </p>
 
 <p align="center">
@@ -10,11 +16,24 @@
   <a href="https://github.com/bogdanticu88/mcp-map/blob/main/LICENSE"><img src="https://img.shields.io/github/license/bogdanticu88/mcp-map?color=5b67f5" alt="License" /></a>
 </p>
 
-# mcpmap
+---
 
-Static attack surface analyzer for MCP servers and LLM tool definitions.
+## Why this matters
 
-mcpmap scans MCP server configurations and OpenAI-style tool definitions for security risks, mapping every finding to [OWASP LLM Top 10](https://genai.owasp.org/) and [MITRE ATLAS](https://atlas.mitre.org/). Use it in CI/CD pipelines, pre-commit hooks, or as a REST API.
+MCP servers run with the same OS permissions as the user who launched them. When you add a server to your Claude Desktop config, you are granting it the ability to read files, execute commands, call APIs, and send emails — silently, on every session start.
+
+Most people install MCP servers the same way they install browser extensions: quickly, without reviewing what they do. The difference is that an MCP server operates inside your AI agent's context, meaning a single malicious or misconfigured server can:
+
+- **execute shell commands** on your machine via prompt injection
+- **read SSH keys, tokens, and credentials** from broad filesystem paths
+- **exfiltrate data** through email or HTTP tools triggered by a poisoned prompt
+- **persist across sessions** because the config is loaded automatically
+
+mcpmap scans your configuration before any of that can happen. It takes under a second, requires no network access, and maps every finding to [OWASP LLM Top 10](https://genai.owasp.org/) and [MITRE ATLAS](https://atlas.mitre.org/) so you know exactly what class of attack each issue enables.
+
+<p align="center">
+  <img src="assets/demo.svg" alt="mcpmap scan output" width="740" />
+</p>
 
 ---
 

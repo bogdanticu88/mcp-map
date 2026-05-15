@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 480" font-family="'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace" font-size="13">
+  <defs>
+    <linearGradient id="winbar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2d2d2d"/>
+      <stop offset="100%" stop-color="#1e1e1e"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Window -->
+  <rect x="10" y="10" width="760" height="460" rx="10" ry="10" fill="#0d1117" filter="url(#shadow)"/>
+
+  <!-- Title bar -->
+  <rect x="10" y="10" width="760" height="36" rx="10" ry="10" fill="url(#winbar)"/>
+  <rect x="10" y="36" width="760" height="10" fill="#1e1e1e"/>
+
+  <!-- Traffic lights -->
+  <circle cx="36" cy="28" r="6" fill="#ff5f57"/>
+  <circle cx="56" cy="28" r="6" fill="#febc2e"/>
+  <circle cx="76" cy="28" r="6" fill="#28c840"/>
+
+  <!-- Title -->
+  <text x="390" y="33" text-anchor="middle" fill="#7d8590" font-size="12">mcpmap</text>
+
+  <!-- Terminal content -->
+
+  <!-- Prompt + command -->
+  <text x="30" y="76" fill="#3fb950">$</text>
+  <text x="44" y="76" fill="#58a6ff">mcpmap scan claude_desktop_config.json</text>
+
+  <!-- Blank line -->
+
+  <!-- CRITICAL finding -->
+  <rect x="30" y="88" width="72" height="17" rx="3" fill="#7f1d1d"/>
+  <text x="66" y="101" text-anchor="middle" fill="#fca5a5" font-weight="bold" font-size="12">CRITICAL</text>
+  <text x="110" y="101" fill="#e6edf3" font-weight="bold">MCM-001</text>
+  <text x="185" y="101" fill="#e6edf3">Shell / Command Execution Capability</text>
+  <text x="110" y="117" fill="#7d8590" font-size="11">server:bash  →  server name matches 'bash' — arbitrary shell access</text>
+
+  <!-- HIGH finding 1 -->
+  <rect x="30" y="128" width="48" height="17" rx="3" fill="#7c2d12"/>
+  <text x="54" y="141" text-anchor="middle" fill="#fdba74" font-weight="bold" font-size="12">HIGH</text>
+  <text x="86" y="141" fill="#e6edf3" font-weight="bold">MCM-010</text>
+  <text x="161" y="141" fill="#e6edf3">API Key Exposed in Server Environment</text>
+  <text x="86" y="157" fill="#7d8590" font-size="11">server:bash  →  env var 'GITHUB_TOKEN' contains a plaintext secret</text>
+
+  <!-- HIGH finding 2 -->
+  <rect x="30" y="168" width="48" height="17" rx="3" fill="#7c2d12"/>
+  <text x="54" y="181" text-anchor="middle" fill="#fdba74" font-weight="bold" font-size="12">HIGH</text>
+  <text x="86" y="181" fill="#e6edf3" font-weight="bold">MCM-011</text>
+  <text x="161" y="181" fill="#e6edf3">Broad Filesystem Access</text>
+  <text x="86" y="197" fill="#7d8590" font-size="11">server:filesystem  →  path '/' exposes entire filesystem to the agent</text>
+
+  <!-- HIGH finding 3 -->
+  <rect x="30" y="208" width="48" height="17" rx="3" fill="#7c2d12"/>
+  <text x="54" y="221" text-anchor="middle" fill="#fdba74" font-weight="bold" font-size="12">HIGH</text>
+  <text x="86" y="221" fill="#e6edf3" font-weight="bold">MCM-020</text>
+  <text x="161" y="221" fill="#e6edf3">Unpinned Package in Auto-Accept Runner</text>
+  <text x="86" y="237" fill="#7d8590" font-size="11">server:bash  →  'npx -y @anthropic-ai/mcp-server-bash' has no version pin</text>
+
+  <!-- HIGH finding 4 -->
+  <rect x="30" y="248" width="48" height="17" rx="3" fill="#7c2d12"/>
+  <text x="54" y="261" text-anchor="middle" fill="#fdba74" font-weight="bold" font-size="12">HIGH</text>
+  <text x="86" y="261" fill="#e6edf3" font-weight="bold">MCM-022</text>
+  <text x="161" y="261" fill="#e6edf3">High-Entropy Secret in Server Environment</text>
+  <text x="86" y="277" fill="#7d8590" font-size="11">server:bash  →  env var 'API_KEY' has Shannon entropy ≥ 4.5 bits/char</text>
+
+  <!-- MEDIUM finding -->
+  <rect x="30" y="288" width="62" height="17" rx="3" fill="#713f12"/>
+  <text x="61" y="301" text-anchor="middle" fill="#fde68a" font-weight="bold" font-size="12">MEDIUM</text>
+  <text x="100" y="301" fill="#e6edf3" font-weight="bold">MCM-013</text>
+  <text x="175" y="301" fill="#e6edf3">Unrestricted Web Browsing / Browser Automation</text>
+  <text x="100" y="317" fill="#7d8590" font-size="11">server:browser  →  unfiltered page content can trigger prompt injection</text>
+
+  <!-- Divider -->
+  <line x1="30" y1="334" x2="750" y2="334" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Summary table header -->
+  <text x="30" y="356" fill="#7d8590" font-size="12">File</text>
+  <text x="480" y="356" fill="#7d8590" font-size="12">CRITICAL</text>
+  <text x="560" y="356" fill="#7d8590" font-size="12">HIGH</text>
+  <text x="610" y="356" fill="#7d8590" font-size="12">MEDIUM</text>
+  <text x="680" y="356" fill="#7d8590" font-size="12">LOW</text>
+  <text x="720" y="356" fill="#7d8590" font-size="12">Total</text>
+
+  <!-- Summary table row -->
+  <text x="30" y="376" fill="#e6edf3" font-size="12">claude_desktop_config.json</text>
+  <text x="502" y="376" text-anchor="middle" fill="#fca5a5" font-weight="bold" font-size="12">1</text>
+  <text x="572" y="376" text-anchor="middle" fill="#fdba74" font-weight="bold" font-size="12">7</text>
+  <text x="632" y="376" text-anchor="middle" fill="#fde68a" font-weight="bold" font-size="12">2</text>
+  <text x="690" y="376" text-anchor="middle" fill="#7d8590" font-size="12">-</text>
+  <text x="735" y="376" text-anchor="middle" fill="#e6edf3" font-weight="bold" font-size="12">10</text>
+
+  <!-- Footer -->
+  <line x1="30" y1="394" x2="750" y2="394" stroke="#30363d" stroke-width="1"/>
+  <text x="30" y="416" fill="#7d8590" font-size="11">10 findings across 1 file  ·  run with --format html for a full report  ·  --fail-on HIGH to gate CI</text>
+
+  <!-- Cursor -->
+  <text x="30" y="446" fill="#3fb950">$</text>
+  <rect x="44" y="433" width="8" height="14" fill="#58a6ff" opacity="0.8"/>
+</svg>
